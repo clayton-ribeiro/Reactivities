@@ -1,23 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios'
-import { Container, List } from 'semantic-ui-react';
+import { Container } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 
 const App = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
 
   useEffect(() => {
     axios.get<Activity[]>("https://localhost:44331/api/activities").then(resp => {
       setActivities(resp.data);
     })
   }, []);
+
+  function handleSelectedActivity(id: string) {
+    setSelectedActivity(activities.find(x => x.id === id))
+  }
+
+  function handleCancelSelectedActivity() {
+    setSelectedActivity(undefined);
+  }
+
   return (
     <>
       <NavBar />
       <Container style={{ marginTop: '7em' }}>
-        <ActivityDashboard activities={activities} />
+        <ActivityDashboard
+          activities={activities}
+          selectedActivity={selectedActivity}
+          selectActivity={handleSelectedActivity}
+          cancelSelectActivity={handleCancelSelectedActivity} />
       </Container>
     </>
   );
